@@ -1,0 +1,48 @@
+{
+  "roles": [
+    {
+      "name": ".NET Developer",
+      "keywords": [
+        ".NET Developer",
+        "ASP.NET Developer",
+        "C# Developer",
+        "Full Stack .NET",
+        "Blazor Developer",
+        "Azure .NET Developer"
+      ],
+      "resume_path": "assets/RITHWIK_RAJ_MALLAM.doc",
+      "message_subject": "Application: .NET Developer",
+      "message_body": "Hello,\n\nI noticed your post for a .NET Developer position. I specialize in building scalable full-stack solutions using C#, ASP.NET Core 8, and Azure Cloud. Please find my resume attached.\n\nThank you,\nRithwik Raj Mallam"
+    },
+    {
+      "name": "SDET / QA Engineer",
+      "keywords": [
+        "SDET Hiring",
+        "QA Automation Engineer",
+        "Software Test Engineer",
+        "Data QA Engineer",
+        "QA Engineer",
+        "Automation QA"
+      ],
+      "resume_path": "assets/Rithwik_R_M.docx",
+      "message_subject": "Application: SDET / QA Engineer",
+      "message_body": "Hello,\n\nI came across your post for an SDET / QA Engineer role. I specialize in Selenium, Pytest, and data validation across AWS Glue and Snowflake pipelines. Please find my resume attached.\n\nThank you,\nRithwik Raj Mallam"
+    },
+    {
+      "name": "Java Developer",
+      "keywords": [
+        "Java Hiring",
+        "Java Developer",
+        "Spring Boot Developer",
+        "Backend Java Developer"
+      ],
+      "resume_path": "assets/Rithwik_Raj_Mallam__Resume.docx",
+      "message_subject": "Application: Java Developer",
+      "message_body": "Hello,\n\nI came across your post on LinkedIn for a Java Developer position. I am interested and have attached my resume for your review.\n\nThank you,\nRithwik Raj Mallam"
+    }
+  ],
+  "search_pages": 2,
+  "run_mode": "loop",
+  "loop_interval_minutes": 360,
+  "cache_file": "data/seen.jsonl"
+}

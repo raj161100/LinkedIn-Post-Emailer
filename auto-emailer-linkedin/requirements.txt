@@ -1,0 +1,11 @@
+
+playwright==1.48.0
+python-dotenv==1.0.1
+google-api-python-client==2.154.0
+google-auth==2.35.0
+google-auth-oauthlib==1.2.1
+rich==13.9.4
+beautifulsoup4==4.12.3
+html5lib==1.1
+tqdm==4.66.5
+requests==2.32.3
