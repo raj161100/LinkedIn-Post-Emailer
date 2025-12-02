@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - RajAI</title>
+
+    <!-- Tailwind + DaisyUI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.1/dist/full.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/glow.css">
+    <script src="/static/konami.js"></script>
+</head>
+
+<body class="bg-[#0d0f15] text-gray-200">
+
+    <!-- SIDEBAR -->
+    <div class="drawer drawer-open">
+      <input id="drawer" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content">
+          <div class="p-6">
+              {% block content %}{% endblock %}
+          </div>
+      </div>
+
+      <div class="drawer-side">
+        <label for="drawer" class="drawer-overlay"></label>
+        <aside class="w-64 bg-[#111827] shadow-xl border-r border-gray-800">
+          <div class="p-4 text-2xl font-bold flex items-center gap-2">
+              <img src="/static/logo.png" class="w-8 h-8">
+              RajAI
+          </div>
+
+          <ul class="menu p-4">
+            <li><a href="/" class="text-lg">🏠 Dashboard</a></li>
+            <li><a href="/settings" class="text-lg">⚙ Settings</a></li>
+            <li><a href="/logs" class="text-lg">📊 Logs</a></li>
+            <li><a href="/resumes" class="text-lg">📁 Resumes</a></li>
+            <li><a href="/account" class="text-lg">👤 Account</a></li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+
+    <footer class="text-center text-xs opacity-40 mt-4">
+        © 2025 RajAI • Made by Rithwik  
+        <br>
+        <span class="opacity-60">(secret key: ↑ ↑ ↓ ↓ ← → ← → B A)</span>
+    </footer>
+
+</body>
+</html>

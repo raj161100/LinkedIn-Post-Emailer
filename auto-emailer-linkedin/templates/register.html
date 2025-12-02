@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-md mx-auto card bg-neutral shadow-xl p-8 mt-10">
+    <h1 class="text-3xl font-bold mb-6 text-center">🧾 Register</h1>
+
+    {% if error %}
+    <div class="alert alert-error mb-4">
+        <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <form method="post" action="/register" class="space-y-4">
+        <label class="block">
+            <span class="text-gray-300">Name</span>
+            <input name="name" type="text" required
+                   class="input input-bordered w-full bg-[#1b2330]">
+        </label>
+
+        <label class="block">
+            <span class="text-gray-300">Email</span>
+            <input name="email" type="email" required
+                   class="input input-bordered w-full bg-[#1b2330]">
+        </label>
+
+        <label class="block">
+            <span class="text-gray-300">Password</span>
+            <input name="password" type="password" required
+                   class="input input-bordered w-full bg-[#1b2330]">
+        </label>
+
+        <button class="btn btn-primary w-full mt-4">Create Account</button>
+    </form>
+
+    <p class="mt-4 text-sm text-center text-gray-400">
+        Already have an account?
+        <a href="/login" class="link link-primary">Login</a>
+    </p>
+</div>
+
+{% endblock %}

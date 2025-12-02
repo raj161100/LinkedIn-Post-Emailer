@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="text-4xl font-bold mb-4 flex items-center gap-2">
+    🛠 Admin Panel
+</h1>
+
+<p class="mb-6 text-gray-300">
+    Welcome, {{ user.name }} ({{ user.role|capitalize }})
+</p>
+
+<!-- QUICK STATS -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="card bg-neutral p-4">
+        <h2 class="text-sm text-gray-400">Emails Today</h2>
+        <p class="text-3xl font-bold text-blue-400">{{ stats.emails_today }}</p>
+    </div>
+    <div class="card bg-neutral p-4">
+        <h2 class="text-sm text-gray-400">Posts Scanned</h2>
+        <p class="text-3xl font-bold text-green-400">{{ stats.posts_scanned }}</p>
+    </div>
+    <div class="card bg-neutral p-4">
+        <h2 class="text-sm text-gray-400">Users</h2>
+        <p class="text-3xl font-bold text-yellow-400">{{ users|length }}</p>
+    </div>
+</div>
+
+<!-- USER MANAGEMENT -->
+<div class="card bg-neutral p-6 shadow-xl">
+    <h2 class="text-2xl font-semibold mb-4">👥 Users</h2>
+
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Created</th>
+                    <th>Change Role</th>
+                    <th>Reset Password</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.name }}</td>
+                    <td>
+                        <span class="badge badge-outline">
+                            {{ u.role|capitalize }}
+                        </span>
+                    </td>
+                    <td>{{ u.created_at }}</td>
+                    <td>
+                        <form method="post" action="/admin/update-role" class="flex gap-2">
+                            <input type="hidden" name="email" value="{{ u.email }}">
+                            <select name="role" class="select select-xs bg-[#1b2330]">
+                                <option value="user" {% if u.role == 'user' %}selected{% endif %}>User</option>
+                                <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Admin</option>
+                                <option value="creator" {% if u.role == 'creator' %}selected{% endif %}>Creator</option>
+                            </select>
+                            <button class="btn btn-xs btn-primary">Save</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="post" action="/admin/reset-password" class="flex gap-2">
+                            <input type="hidden" name="email" value="{{ u.email }}">
+                            <input type="password" name="new_password"
+                                   placeholder="New password"
+                                   class="input input-xs bg-[#1b2330]" required>
+                            <button class="btn btn-xs btn-error">Reset</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

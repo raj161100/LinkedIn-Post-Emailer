@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="text-4xl font-bold mb-6">📁 Resume Manager</h1>
+
+<!-- UPLOAD FORM -->
+<div class="card bg-neutral p-6 shadow-xl mb-10">
+    <h2 class="text-xl font-semibold mb-3">Upload New Resume</h2>
+
+    <form method="post" action="/upload-resume" enctype="multipart/form-data" class="flex gap-4">
+        <input type="file" name="file" class="file-input file-input-bordered w-full bg-[#1b2330]" required />
+        <button class="btn btn-primary">Upload</button>
+    </form>
+</div>
+
+<!-- EXISTING RESUMES -->
+<h2 class="text-2xl font-semibold mb-4">Existing Resumes</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    {% for r in resumes %}
+    <div class="card bg-neutral shadow-xl p-5">
+        <h3 class="text-lg font-semibold">{{ r }}</h3>
+
+        <div class="flex justify-between items-center mt-4">
+            <a href="/assets/{{ r }}" class="btn btn-sm btn-outline btn-info" download>
+                Download
+            </a>
+
+            <form method="post" action="/delete-resume">
+                <input type="hidden" name="filename" value="{{ r }}">
+                <button class="btn btn-sm btn-error">Delete</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

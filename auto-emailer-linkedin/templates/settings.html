@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="text-4xl font-bold mb-6">Settings</h1>
+
+<form method="post" action="/update-settings" class="space-y-8">
+
+    <!-- AUTO APPLY -->
+    <div class="card bg-neutral shadow-xl p-6">
+        <h2 class="text-xl font-semibold mb-3">Auto Apply</h2>
+
+        <label class="label cursor-pointer">
+            <span class="label-text">Enable Auto Apply</span>
+            <input type="checkbox" name="auto_apply" class="toggle toggle-success"
+                {% if cfg.auto_apply.enabled %}checked{% endif %}>
+        </label>
+
+        <label class="block mt-4">
+            <span class="text-gray-300">Limit Per Run</span>
+            <input type="number" name="limit_per_run" value="{{ cfg.auto_apply.limit_per_run }}"
+                class="input input-bordered w-full bg-[#1a2130]">
+        </label>
+    </div>
+
+
+    <!-- EXPERIENCE -->
+    <div class="card bg-neutral shadow-xl p-6">
+        <h2 class="text-xl font-semibold mb-3">Experience Filter</h2>
+
+        <label class="block">
+            <span class="text-gray-300">Max Years of Experience</span>
+            <input type="number" name="max_years" value="{{ cfg.experience.max_years }}"
+                class="input input-bordered w-full bg-[#1a2130]">
+        </label>
+
+        <label class="block mt-4">
+            <span class="text-gray-300">Entry-Level Terms (always allowed)</span>
+            <textarea name="entry_terms"
+                class="textarea textarea-bordered w-full bg-[#1a2130]">{{ cfg.experience.entry_terms | join(', ') }}</textarea>
+        </label>
+    </div>
+
+
+    <!-- LOCATION FILTERS -->
+    <div class="card bg-neutral shadow-xl p-6">
+
+        <h2 class="text-xl font-semibold mb-3">Location Filters</h2>
+
+        <h3 class="font-medium mt-3 mb-1">Include:</h3>
+        <textarea name="include_locs"
+            class="textarea textarea-bordered w-full bg-[#1a2130]">{{ cfg.location_filters.include | join(', ') }}</textarea>
+
+        <h3 class="font-medium mt-4 mb-1">Exclude:</h3>
+        <textarea name="exclude_locs"
+            class="textarea textarea-bordered w-full bg-[#1a2130]">{{ cfg.location_filters.exclude | join(', ') }}</textarea>
+
+    </div>
+
+    <!-- PHRASE FILTERS -->
+    <div class="card bg-neutral shadow-xl p-6">
+        <h2 class="text-xl font-semibold mb-3">Phrase Filters</h2>
+
+        <h3 class="font-medium mt-3 mb-1">Prefer phrases (greenlight posts)</h3>
+        <textarea name="prefer_phrases"
+            class="textarea textarea-bordered w-full bg-[#1a2130]">{{ cfg.phrase_filters.prefer | join(', ') }}</textarea>
+
+        <h3 class="font-medium mt-4 mb-1">Exclude phrases (skip posts)</h3>
+        <textarea name="exclude_phrases"
+            class="textarea textarea-bordered w-full bg-[#1a2130]">{{ cfg.phrase_filters.exclude | join(', ') }}</textarea>
+    </div>
+
+    <!-- VISA FILTERS -->
+    <div class="card bg-neutral shadow-xl p-6">
+        <h2 class="text-xl font-semibold mb-3">Visa Filters</h2>
+
+        <h3 class="font-medium mt-3 mb-1">Visa-friendly phrases</h3>
+        <textarea name="visa_prefer"
+            class="textarea textarea-bordered w-full bg-[#1a2130]">{{ cfg.visa_filters.prefer | join(', ') }}</textarea>
+
+        <h3 class="font-medium mt-4 mb-1">Visa exclusion phrases</h3>
+        <textarea name="visa_exclude"
+            class="textarea textarea-bordered w-full bg-[#1a2130]">{{ cfg.visa_filters.exclude | join(', ') }}</textarea>
+    </div>
+
+
+    <!-- LOOP -->
+    <div class="card bg-neutral shadow-xl p-6">
+        <h2 class="text-xl font-semibold mb-3">Loop Interval</h2>
+        <input name="loop_interval"
+               type="number"
+               value="{{ cfg.loop_interval_minutes }}"
+               class="input input-bordered w-full bg-[#1a2130]">
+    </div>
+
+
+    <button class="btn btn-primary w-full text-lg">
+        Save Settings
+    </button>
+
+</form>
+
+{% endblock %}

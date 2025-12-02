@@ -1,0 +1,30 @@
+.glow-card {
+    background: #111;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px #6a4df6;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    color: #c69ff9;
+    margin-bottom: 10px;
+}
+
+.card-value {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.btn-run {
+    background: #7c3aed;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.btn-settings {
+    background: #374151;
+    padding: 12px 22px;
+    border-radius: 8px;
+}

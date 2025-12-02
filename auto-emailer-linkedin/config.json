@@ -1,18 +1,124 @@
 {
+  "experience": {
+    "max_years": 4,
+    "entry_terms": [
+      "entry level",
+      "junior",
+      "graduate",
+      "intern"
+    ]
+  },
+  "phrase_filters": {
+    "exclude": [
+      "no h1b",
+      "no h-1b",
+      "us citizen",
+      "usc only",
+      "usc and gc only",
+      "no sponsorship",
+      "cannot sponsor",
+      "sponsorship not available",
+      "gc only",
+      "only gc",
+      "must be gc",
+      "us only",
+      "us persons only",
+      "citizens only",
+      "no visa",
+      "no cpt",
+      "no opt"
+    ],
+    "prefer": [
+      "h1b ok",
+      "h1b accepted",
+      "h-1b ok",
+      "visa sponsorship",
+      "sponsorship available",
+      "open to h1b",
+      "can sponsor",
+      "h1b welcome",
+      "h1b transfer",
+      "visa supported",
+      "will sponsor",
+      "h1b candidates",
+      "provides sponsorship"
+    ]
+  },
+  "visa_filters": {
+    "exclude": [
+      "no h1b",
+      "no h-1b",
+      "no sponsorship",
+      "cannot sponsor",
+      "sponsorship not available",
+      "no visa",
+      "no cpt",
+      "no opt",
+      "no stem opt"
+    ],
+    "prefer": [
+      "opt",
+      "stem opt",
+      "cpt",
+      "h1b",
+      "h1-b",
+      "visa sponsorship",
+      "can sponsor",
+      "will sponsor"
+    ]
+  },
+  "location_filters": {
+    "include": [
+      "usa",
+      "united states",
+      "remote",
+      "hybrid",
+      "new jersey",
+      "new york",
+      "texas",
+      "california",
+      "philadelphia",
+      "georgia",
+      "virginia"
+    ],
+    "exclude": [
+      "india",
+      "canada",
+      "mexico",
+      "europe",
+      "australia"
+    ]
+  },
+  "auto_apply": {
+    "enabled": false,
+    "limit_per_run": 2
+  },
+  "job_cooldown_days": 10,
+  "job_cache_file": "data/jobs_seen.jsonl",
   "roles": [
     {
       "name": ".NET Developer",
       "keywords": [
         ".NET Developer",
-        "ASP.NET Developer",
+        "ASP.NET Core Developer",
         "C# Developer",
-        "Full Stack .NET",
-        "Blazor Developer",
-        "Azure .NET Developer"
+        "Azure Developer",
+        "Full Stack .NET"
       ],
-      "resume_path": "assets/RITHWIK_RAJ_MALLAM.doc",
+      "resume_path": "assets/RITHWIK_RAJ_MALLAM.docx",
       "message_subject": "Application: .NET Developer",
-      "message_body": "Hello,\n\nI noticed your post for a .NET Developer position. I specialize in building scalable full-stack solutions using C#, ASP.NET Core 8, and Azure Cloud. Please find my resume attached.\n\nThank you,\nRithwik Raj Mallam"
+      "message_body": "Hello,\n\nI noticed your post for a .NET Developer position. I specialize in building scalable full-stack solutions using C#, ASP.NET Core 8, and Azure Cloud. Please find my resume attached.\n\nThank you,\nRithwik Raj Mallam",
+      "customize": {
+        "enabled": true,
+        "base_resume": "templates/base_NET_resume.docx"
+      },
+      "required_skills": [
+        ".net",
+        "c#",
+        "asp.net",
+        "web api",
+        "azure"
+      ]
     },
     {
       "name": "SDET / QA Engineer",
@@ -20,29 +126,81 @@
         "SDET Hiring",
         "QA Automation Engineer",
         "Software Test Engineer",
-        "Data QA Engineer",
         "QA Engineer",
+        "Software Development Engineer in Test",
         "Automation QA"
       ],
       "resume_path": "assets/Rithwik_R_M.docx",
       "message_subject": "Application: SDET / QA Engineer",
-      "message_body": "Hello,\n\nI came across your post for an SDET / QA Engineer role. I specialize in Selenium, Pytest, and data validation across AWS Glue and Snowflake pipelines. Please find my resume attached.\n\nThank you,\nRithwik Raj Mallam"
+      "message_body": "Hello,\n\nI came across your post for an SDET / QA Engineer role. I specialize in Selenium, Playwright, and CI/CD test automation. Please find my resume attached.\n\nThank you,\nRithwik Raj Mallam",
+      "customize": {
+        "enabled": true,
+        "base_resume": "templates/base_SDET_resume.docx"
+      },
+      "required_skills": [
+        "sdet",
+        "selenium",
+        "playwright",
+        "automation",
+        "qa",
+        "test automation"
+      ]
     },
     {
       "name": "Java Developer",
       "keywords": [
-        "Java Hiring",
         "Java Developer",
         "Spring Boot Developer",
-        "Backend Java Developer"
+        "Backend Java Developer",
+        "Full Stack Java",
+        "Java Engineer",
+        "Hiring Java"
       ],
       "resume_path": "assets/Rithwik_Raj_Mallam__Resume.docx",
       "message_subject": "Application: Java Developer",
-      "message_body": "Hello,\n\nI came across your post on LinkedIn for a Java Developer position. I am interested and have attached my resume for your review.\n\nThank you,\nRithwik Raj Mallam"
+      "message_body": "Hello,\n\nI came across your post on LinkedIn for a Java Developer position. I am interested and have attached my resume for your review.\n\nThank you,\nRithwik Raj Mallam",
+      "customize": {
+        "enabled": true,
+        "base_resume": "templates/base_Java_resume.docx"
+      },
+      "required_skills": [
+        "java",
+        "spring boot",
+        "microservices",
+        "rest api"
+      ]
+    },
+    {
+      "name": "Data Engineer",
+      "keywords": [
+        "Data Engineer",
+        "Azure Data Engineer",
+        "ETL Developer",
+        "Data Pipeline Engineer",
+        "Big Data Engineer",
+        "SQL Data Engineer",
+        "Talend Developer"
+      ],
+      "resume_path": "assets/Rithwik_Raj_Mallam_ResumeDE.docx",
+      "message_subject": "Application: Data Engineer",
+      "message_body": "Hello,\n\nI came across your post for a Data Engineer position. I specialize in designing and optimizing data pipelines using Azure Data Factory (ADF), Databricks, Synapse, and SQL. Please find my resume attached.\n\nThank you,\nRithwik Raj Mallam",
+      "customize": {
+        "enabled": true,
+        "base_resume": "templates/base_DataEngineer_resume.docx"
+      },
+      "required_skills": [
+        "data engineer",
+        "azure data factory",
+        "adf",
+        "databricks",
+        "synapse",
+        "sql",
+        "etl"
+      ]
     }
   ],
   "search_pages": 2,
   "run_mode": "loop",
-  "loop_interval_minutes": 360,
+  "loop_interval_minutes": 120,
   "cache_file": "data/seen.jsonl"
 }

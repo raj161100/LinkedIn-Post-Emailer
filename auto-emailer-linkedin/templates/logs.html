@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="text-3xl font-bold mb-4">📜 Today’s Sent Emails</h1>
+
+<p class="mb-4 text-sm text-slate-400">
+  Total rows: <span class="font-semibold text-sky-300">{{ entries|length }}</span>
+</p>
+
+<div class="mb-4 flex justify-between items-center text-xs text-slate-400">
+  <span>Showing logs from <code>logs/sent_YYYY-MM-DD.jsonl</code></span>
+</div>
+
+<div class="overflow-x-auto">
+  <table id="log-table" class="table table-xs text-xs text-slate-200">
+    <thead class="bg-slate-900/80">
+      <tr>
+        <th data-col="time">Time ⬍</th>
+        <th data-col="role">Role ⬍</th>
+        <th data-col="keyword">Keyword ⬍</th>
+        <th data-col="email">Email ⬍</th>
+        <th data-col="company">Company ⬍</th>
+        <th data-col="preferred">Preferred ⬍</th>
+        <th data-col="post">Post</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in entries %}
+      <tr class="hover:bg-slate-900/50">
+        <td class="whitespace-nowrap">{{ l.timestamp }}</td>
+        <td class="whitespace-nowrap">{{ l.role }}</td>
+        <td class="whitespace-nowrap">{{ l.keyword }}</td>
+        <td class="whitespace-nowrap">
+          {% if l.post_link %}
+            <a href="{{ l.post_link }}" target="_blank"
+               class="text-sky-300 hover:underline">
+              {{ l.email }}
+            </a>
+          {% else %}
+            {{ l.email }}
+          {% endif %}
+        </td>
+        <td>{{ l.company }}</td>
+        <td>
+          {% if l.preferred_bucket is true %}
+            <span class="badge badge-xs badge-success">Preferred</span>
+          {% elif l.preferred_bucket is false %}
+            <span class="badge badge-xs badge-ghost">Neutral</span>
+          {% else %}
+            <span class="badge badge-xs badge-ghost">-</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if l.post_link %}
+            <a href="{{ l.post_link }}" target="_blank"
+               class="btn btn-ghost btn-xs text-sky-300">🔗 Open</a>
+          {% else %}
+            —
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      {% if entries|length == 0 %}
+      <tr>
+        <td colspan="7" class="text-center text-slate-500 py-6">
+          No logs for today yet.
+        </td>
+      </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+// very light client-side sort
+document.querySelectorAll('#log-table thead th').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.getAttribute('data-col');
+    if (!col) return;
+
+    const tbody = document.querySelector('#log-table tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    const idx = Array.from(th.parentElement.children).indexOf(th);
+    const asc = !th.classList.contains('sorted-asc');
+
+    rows.sort((a, b) => {
+      const ta = a.children[idx].innerText.toLowerCase();
+      const tb = b.children[idx].innerText.toLowerCase();
+      if (ta < tb) return asc ? -1 : 1;
+      if (ta > tb) return asc ? 1 : -1;
+      return 0;
+    });
+
+    tbody.innerHTML = "";
+    rows.forEach(r => tbody.appendChild(r));
+
+    // toggle sort indicator
+    document.querySelectorAll('#log-table thead th')
+      .forEach(x => x.classList.remove('sorted-asc', 'sorted-desc'));
+    th.classList.add(asc ? 'sorted-asc' : 'sorted-desc');
+  });
+});
+</script>
+
+{% endblock %}
