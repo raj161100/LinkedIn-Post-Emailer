@@ -20,6 +20,15 @@ Quick launcher
 - Run with Python: `python run_dashboard.py` from the repo root. It prefers `.venv/Scripts/python.exe` if present, otherwise uses system Python, starts `auto-emailer-linkedin/web_app.py`, and opens your browser to http://127.0.0.1:8000.
 - Build a Windows .exe (from the venv): `.\.venv\Scripts\pyinstaller --onefile --noconsole --name run-dashboard run_dashboard.py`. Double-click `dist/run-dashboard.exe` to start the app and open the browser. Rebuild after dependency changes.
 
+Setup (Gmail + LinkedIn)
+- Create a `.env` in the repo root (or use the Account page to fill these later) with:
+  - `LINKEDIN_EMAIL=your_linkedin_email`
+  - `LINKEDIN_PASSWORD=your_linkedin_password`
+  - `GMAIL_SENDER=the_gmail_account_used_to_send`
+- Add your Google client secret: place `google_client_secret.json` in the repo root, or upload it via the Account page in the web app (it writes `auto-emailer-linkedin/google_client_secret.json`).
+- Start the app (`python run_dashboard.py` or your PyInstaller exe). The first Gmail send will prompt OAuth in the browser and create `token.json`.
+- You can update LinkedIn email/password and Gmail sender via the Account page; the app writes them into `.env` for you.
+
 🚀 Features
 
 ✅ LinkedIn Content Scraper
