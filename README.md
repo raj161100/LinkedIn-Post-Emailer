@@ -180,3 +180,20 @@ How to refresh the Gmail token (token.json expired)
 - Start the app or any entrypoint that touches Gmail (for example `python main.py` or the FastAPI dashboard). The first Gmail send will trigger Google’s consent flow.
 - When the browser window opens, sign in with the Gmail account you want to use and allow the requested scopes.
 - A new `token.json` will be written automatically. Keep it alongside `google_client_secret.json` for future runs.
+
+Beginner setup (step-by-step)
+1) Install Python: get Python 3.10+ from python.org. On Windows, check “Add Python to PATH”.
+2) Install Git: download from git-scm.com and install (defaults are fine).
+3) Get the code: clone or download this repo, then open a terminal in the project folder (the one containing `auto-emailer-linkedin/`).
+4) Create a virtualenv (recommended):
+   - Windows: `python -m venv .venv` then `.\.venv\Scripts\activate`
+   - macOS/Linux: `python3 -m venv .venv` then `source .venv/bin/activate`
+5) Install dependencies: `pip install -r auto-emailer-linkedin/requirements.txt`
+6) Add secrets:
+   - Create `.env` in the project root with `LINKEDIN_EMAIL=...`, `LINKEDIN_PASSWORD=...`, `GMAIL_SENDER=...`
+   - Place `google_client_secret.json` in the project root (same level as `.env`) or upload it via the Account page.
+7) Start the dashboard:
+   - `python run_dashboard.py` (opens http://127.0.0.1:8000). If you built a PyInstaller exe, double-click it instead.
+8) Upload resumes on the Resumes page. Use “Add a Custom Role” to create roles (e.g., Python Developer) with keywords, required skills, subject/body, and pick the resume file. Use “Link Resume to Email Template” to update existing roles.
+9) Run: from the Dashboard page trigger a run or start/stop the loop. The first Gmail send will open a Google OAuth window to create `token.json`.
+10) Safety: never commit `.env`, `google_client_secret.json`, `token.json`, logs, or resumes. They’re in `.gitignore`, but always check `git status` before pushing.
