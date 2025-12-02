@@ -13,12 +13,12 @@ def find_project_dir(base_dir: Path) -> Path | None:
     """
     Try to locate the project folder regardless of where the launcher is run from.
     """
-    candidates = [
-        base_dir / "auto-emailer-linkedin",
-        base_dir / "LinkedIn-Post-Emailer",
-        base_dir / "LinkedIn-Post-Emailer-main",
-        base_dir,  # if run from inside the project folder
+    names = [
+        "auto-emailer-linkedin",
+        "LinkedIn-Post-Emailer",
+        "LinkedIn-Post-Emailer-main",
     ]
+    candidates = [base_dir] + [base_dir / n for n in names] + [base_dir.parent / n for n in names] + [base_dir.parent]
     for c in candidates:
         if (c / "web_app.py").exists():
             return c
@@ -48,8 +48,8 @@ def main():
 
     if project_dir is None:
         print(
-            "Could not find the project folder. Ensure this launcher sits next to the "
-            "'auto-emailer-linkedin', 'LinkedIn-Post-Emailer', or 'LinkedIn-Post-Emailer-main' folder."
+            "Could not find the project folder. Ensure this launcher sits next to or inside one of:\n"
+            "- auto-emailer-linkedin\n- LinkedIn-Post-Emailer\n- LinkedIn-Post-Emailer-main"
         )
         sys.exit(1)
 
