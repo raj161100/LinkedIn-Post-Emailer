@@ -1,20 +1,28 @@
 # Ignore environment files
 .env
+.venv/
+.vs/
 
 # Ignore resume files
 assets/*.doc
 assets/*.docx
+assets/*.pdf
 
 # Ignore cache files
 data/seen.jsonl
+data/*.jsonl
+build/
+dist/
 
 # Ignore system files
 .DS_Store
 Thumbs.db
+__pycache__/
 
 # Ignore node_modules and logs
 node_modules/
 *.logs
+logs/
 
 # Ignore Google OAuth credentials
 google_oauth_credentials.json
@@ -22,3 +30,6 @@ google_oauth_credentials.json
 # Ignore Google OAuth client secrets and tokens
 google_client_secret.json
 token.json
+
+# Ignore LinkedIn session state
+linkedin_state.json

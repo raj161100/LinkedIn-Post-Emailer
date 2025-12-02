@@ -16,6 +16,10 @@ Enforces a 10-day cooldown to avoid duplicate outreach
 
 Generates a daily email report with all recruiter contacts and company summaries
 
+Quick launcher
+- Run with Python: `python run_dashboard.py` from the repo root. It prefers `.venv/Scripts/python.exe` if present, otherwise uses system Python, starts `auto-emailer-linkedin/web_app.py`, and opens your browser to http://127.0.0.1:8000.
+- Build a Windows .exe (from the venv): `.\.venv\Scripts\pyinstaller --onefile --noconsole --name run-dashboard run_dashboard.py`. Double-click `dist/run-dashboard.exe` to start the app and open the browser. Rebuild after dependency changes.
+
 🚀 Features
 
 ✅ LinkedIn Content Scraper
@@ -160,3 +164,10 @@ Total Emails Sent Today: 5
 
 linkedin automation, job email bot, gmail api, python playwright, h1b sponsorship, resume sender, recruiter email scraper, .NET developer, SDET automation, job search tool
 
+How to refresh the Gmail token (token.json expired)
+
+- Make sure you still have `google_client_secret.json` in the repo root (same folder as `token.json`).
+- Delete the old token file so the OAuth flow runs again: remove `token.json` in the project root.
+- Start the app or any entrypoint that touches Gmail (for example `python main.py` or the FastAPI dashboard). The first Gmail send will trigger Google’s consent flow.
+- When the browser window opens, sign in with the Gmail account you want to use and allow the requested scopes.
+- A new `token.json` will be written automatically. Keep it alongside `google_client_secret.json` for future runs.
