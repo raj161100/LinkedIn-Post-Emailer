@@ -37,4 +37,95 @@
 
 </div>
 
+<!-- ADD CUSTOM ROLE -->
+<div class="card bg-neutral p-6 shadow-xl mt-10 space-y-4">
+    <h2 class="text-2xl font-semibold mb-3">Add a Custom Role</h2>
+    <p class="text-sm text-gray-300">Create a new role (e.g., Python Developer) with its own resume, keywords, and email template.</p>
+
+    <form method="post" action="/add-role" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="block">
+                <span class="text-sm text-gray-300">Role Name</span>
+                <input type="text" name="role_name" class="input input-bordered w-full bg-[#1b2330]" placeholder="Python Developer" required>
+            </label>
+
+            <label class="block">
+                <span class="text-sm text-gray-300">Resume File</span>
+                <select name="resume_filename" class="select select-bordered w-full bg-[#1b2330]">
+                    <option value="" selected>Use placeholder or add later</option>
+                    {% for r in resumes %}
+                    <option value="{{ r }}">{{ r }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+
+        <label class="block">
+            <span class="text-sm text-gray-300">Keywords (comma-separated)</span>
+            <textarea name="keywords" class="textarea textarea-bordered w-full bg-[#1b2330]" rows="2" placeholder="Python Developer, Django, FastAPI"></textarea>
+        </label>
+
+        <label class="block">
+            <span class="text-sm text-gray-300">Required Skills (comma-separated)</span>
+            <textarea name="required_skills" class="textarea textarea-bordered w-full bg-[#1b2330]" rows="2" placeholder="python, django, fastapi, api"></textarea>
+        </label>
+
+        <label class="block">
+            <span class="text-sm text-gray-300">Email Subject</span>
+            <input type="text" name="message_subject" class="input input-bordered w-full bg-[#1b2330]" placeholder="Application: Python Developer">
+        </label>
+
+        <label class="block">
+            <span class="text-sm text-gray-300">Email Body</span>
+            <textarea name="message_body" class="textarea textarea-bordered w-full bg-[#1b2330]" rows="5" placeholder="Hello,\n\nI saw your post ...\n\nThank you,\nYour Name"></textarea>
+        </label>
+
+        <button class="btn btn-primary w-full">Create Role</button>
+    </form>
+</div>
+
+<!-- MAP RESUME + EMAIL TEMPLATE -->
+<div class="card bg-neutral p-6 shadow-xl mt-10 space-y-4">
+    <h2 class="text-2xl font-semibold mb-3">Link Resume to Email Template</h2>
+    <p class="text-sm text-gray-300">Select a role, pick a resume file, and set the subject/body used when sending.</p>
+
+    <form method="post" action="/update-role-template" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="block">
+                <span class="text-sm text-gray-300">Role</span>
+                <select name="role_name" class="select select-bordered w-full bg-[#1b2330]" required>
+                    <option value="" disabled selected>Select a role</option>
+                    {% for role in roles %}
+                    <option value="{{ role.name }}">{{ role.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <label class="block">
+                <span class="text-sm text-gray-300">Resume File</span>
+                <select name="resume_filename" class="select select-bordered w-full bg-[#1b2330]">
+                    <option value="" selected>Keep existing resume</option>
+                    {% for r in resumes %}
+                    <option value="{{ r }}">{{ r }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+
+        <label class="block">
+            <span class="text-sm text-gray-300">Email Subject</span>
+            <input type="text" name="message_subject" class="input input-bordered w-full bg-[#1b2330]"
+                   placeholder="Application: Role Name">
+        </label>
+
+        <label class="block">
+            <span class="text-sm text-gray-300">Email Body</span>
+            <textarea name="message_body" class="textarea textarea-bordered w-full bg-[#1b2330]" rows="5"
+                      placeholder="Hello,\n\nI saw your post ...\n\nThank you,\nYour Name"></textarea>
+        </label>
+
+        <button class="btn btn-primary w-full">Save Template for Role</button>
+    </form>
+</div>
+
 {% endblock %}

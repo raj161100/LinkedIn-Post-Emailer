@@ -105,9 +105,9 @@
         "Azure Developer",
         "Full Stack .NET"
       ],
-      "resume_path": "assets/RITHWIK_RAJ_MALLAM.docx",
-      "message_subject": "Application: .NET Developer",
-      "message_body": "Hello,\n\nI noticed your post for a .NET Developer position. I specialize in building scalable full-stack solutions using C#, ASP.NET Core 8, and Azure Cloud. Please find my resume attached.\n\nThank you,\nRithwik Raj Mallam",
+      "resume_path": "assets/PLACEHOLDER_RESUME.docx",
+      "message_subject": "Application: .NET Developer (customize in dashboard)",
+      "message_body": "Hello,\n\nI noticed your post for a .NET Developer position. I specialize in building scalable full-stack solutions using C#, ASP.NET Core, and Azure Cloud. Please find my resume attached.\n\nThank you,\n<Your Name>",
       "customize": {
         "enabled": true,
         "base_resume": "templates/base_NET_resume.docx"
@@ -130,9 +130,9 @@
         "Software Development Engineer in Test",
         "Automation QA"
       ],
-      "resume_path": "assets/Rithwik_R_M.docx",
-      "message_subject": "Application: SDET / QA Engineer",
-      "message_body": "Hello,\n\nI came across your post for an SDET / QA Engineer role. I specialize in Selenium, Playwright, and CI/CD test automation. Please find my resume attached.\n\nThank you,\nRithwik Raj Mallam",
+      "resume_path": "assets/PLACEHOLDER_RESUME.docx",
+      "message_subject": "Application: SDET / QA Engineer (customize in dashboard)",
+      "message_body": "Hello,\n\nI came across your post for an SDET / QA Engineer role. I specialize in Selenium, Playwright, and CI/CD test automation. Please find my resume attached.\n\nThank you,\n<Your Name>",
       "customize": {
         "enabled": true,
         "base_resume": "templates/base_SDET_resume.docx"
@@ -156,9 +156,9 @@
         "Java Engineer",
         "Hiring Java"
       ],
-      "resume_path": "assets/Rithwik_Raj_Mallam__Resume.docx",
-      "message_subject": "Application: Java Developer",
-      "message_body": "Hello,\n\nI came across your post on LinkedIn for a Java Developer position. I am interested and have attached my resume for your review.\n\nThank you,\nRithwik Raj Mallam",
+      "resume_path": "assets/PLACEHOLDER_RESUME.docx",
+      "message_subject": "Application: Java Developer (customize in dashboard)",
+      "message_body": "Hello,\n\nI came across your post on LinkedIn for a Java Developer position. I am interested and have attached my resume for your review.\n\nThank you,\n<Your Name>",
       "customize": {
         "enabled": true,
         "base_resume": "templates/base_Java_resume.docx"
@@ -181,9 +181,9 @@
         "SQL Data Engineer",
         "Talend Developer"
       ],
-      "resume_path": "assets/Rithwik_Raj_Mallam_ResumeDE.docx",
-      "message_subject": "Application: Data Engineer",
-      "message_body": "Hello,\n\nI came across your post for a Data Engineer position. I specialize in designing and optimizing data pipelines using Azure Data Factory (ADF), Databricks, Synapse, and SQL. Please find my resume attached.\n\nThank you,\nRithwik Raj Mallam",
+      "resume_path": "assets/PLACEHOLDER_RESUME.docx",
+      "message_subject": "Application: Data Engineer (customize in dashboard)",
+      "message_body": "Hello,\n\nI came across your post for a Data Engineer position. I specialize in designing and optimizing data pipelines using Azure Data Factory (ADF), Databricks, Synapse, and SQL. Please find my resume attached.\n\nThank you,\n<Your Name>",
       "customize": {
         "enabled": true,
         "base_resume": "templates/base_DataEngineer_resume.docx"
@@ -196,6 +196,27 @@
         "synapse",
         "sql",
         "etl"
+      ]
+    },
+    {
+      "name": "Python Developer",
+      "keywords": [
+        "Python Developer",
+        "Kafka",
+        "Amazon S3",
+        "Django"
+      ],
+      "resume_path": "assets/PLACEHOLDER_RESUME.docx",
+      "message_subject": "Application: Python Developer",
+      "message_body": "Hello,\r\nI came across your post for the python developer role and wanted to apply for the same.\r\nPlease find my resume attached below.\r\nThank you,",
+      "customize": {
+        "enabled": false
+      },
+      "required_skills": [
+        "python",
+        "django",
+        "fastapi",
+        "api"
       ]
     }
   ],

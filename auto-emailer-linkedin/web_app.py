@@ -374,9 +374,10 @@ async def logs_page(request: Request):
 @app.get("/resumes", response_class=HTMLResponse)
 async def resumes_page(request: Request):
     resumes = list_resumes()
+    cfg = load_config()
     return templates.TemplateResponse(
         "resumes.html",
-        {"request": request, "resumes": resumes},
+        {"request": request, "resumes": resumes, "roles": cfg.get("roles", [])},
     )
 
 
@@ -393,6 +394,69 @@ async def delete_resume(filename: str = Form(...)):
     path = os.path.join(ASSETS_DIR, filename)
     if os.path.exists(path):
         os.remove(path)
+    return RedirectResponse("/resumes", status_code=303)
+
+
+@app.post("/update-role-template")
+async def update_role_template(
+    role_name: str = Form(...),
+    resume_filename: str = Form(None),
+    message_subject: str = Form(""),
+    message_body: str = Form(""),
+):
+    cfg = load_config()
+    roles = cfg.get("roles", [])
+    updated = False
+    for role in roles:
+        if role.get("name") == role_name:
+            if resume_filename:
+                role["resume_path"] = f"assets/{resume_filename}"
+            if message_subject:
+                role["message_subject"] = message_subject
+            if message_body:
+                role["message_body"] = message_body
+            updated = True
+            break
+
+    if updated:
+        with open("config.json", "w", encoding="utf-8") as f:
+            json.dump(cfg, f, indent=2)
+
+    return RedirectResponse("/resumes", status_code=303)
+
+
+@app.post("/add-role")
+async def add_role(
+    role_name: str = Form(...),
+    keywords: str = Form(""),
+    required_skills: str = Form(""),
+    resume_filename: str = Form(""),
+    message_subject: str = Form(""),
+    message_body: str = Form(""),
+):
+    cfg = load_config()
+    cfg.setdefault("roles", [])
+
+    def parse_csv(val: str):
+        cleaned = val.replace("\n", ",")
+        return [x.strip() for x in cleaned.split(",") if x.strip()]
+
+    role = {
+        "name": role_name.strip(),
+        "keywords": parse_csv(keywords),
+        "resume_path": f"assets/{resume_filename}" if resume_filename else "assets/PLACEHOLDER_RESUME.docx",
+        "message_subject": message_subject or f"Application: {role_name}",
+        "message_body": message_body
+        or "Hello,\n\nI saw your post and am interested. Please find my resume attached.\n\nThank you,\n<Your Name>",
+        "customize": {"enabled": False},
+        "required_skills": parse_csv(required_skills),
+    }
+
+    cfg["roles"].append(role)
+
+    with open("config.json", "w", encoding="utf-8") as f:
+        json.dump(cfg, f, indent=2)
+
     return RedirectResponse("/resumes", status_code=303)
 
 
