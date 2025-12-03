@@ -41,6 +41,27 @@ def find_python(project_dir: Path) -> Path:
     return Path(sys.executable)
 
 
+def bootstrap_venv(project_dir: Path) -> Path:
+    """
+    Create .venv and install dependencies if missing. Returns the venv python path.
+    """
+    venv_dir = project_dir / ".venv"
+    venv_python = venv_dir / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+
+    if not venv_python.exists():
+        print("Creating virtualenv ...")
+        subprocess.check_call([sys.executable, "-m", "venv", str(venv_dir)])
+
+    requirements = project_dir / "requirements.txt"
+    if requirements.exists():
+        print("Installing dependencies ...")
+        subprocess.check_call([str(venv_python), "-m", "pip", "install", "-r", str(requirements)])
+    else:
+        print("requirements.txt not found; skipping dependency install.")
+
+    return venv_python
+
+
 def main():
     # When frozen by PyInstaller, __file__ points inside the bundle; use sys.executable for the exe location
     base_dir = Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent
@@ -56,12 +77,7 @@ def main():
     python_cmd = find_python(project_dir)
 
     if not python_cmd.exists():
-        print(
-            "Virtualenv not found. Create it and install dependencies before running:\n"
-            "Windows: python -m venv .venv && .\\.venv\\Scripts\\activate && pip install -r auto-emailer-linkedin/requirements.txt\n"
-            "macOS/Linux: python3 -m venv .venv && source .venv/bin/activate && pip install -r auto-emailer-linkedin/requirements.txt"
-        )
-        sys.exit(1)
+        python_cmd = bootstrap_venv(project_dir)
 
     print(f"Using interpreter: {python_cmd}")
     print(f"Starting web_app.py in {project_dir} ...")
