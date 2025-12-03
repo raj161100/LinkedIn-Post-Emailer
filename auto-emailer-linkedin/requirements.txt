@@ -12,5 +12,5 @@ fastapi
 uvicorn
 jinja2
 requests
-multipart
+python-multipart
 itsdangerous

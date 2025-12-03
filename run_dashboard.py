@@ -55,6 +55,14 @@ def main():
 
     python_cmd = find_python(project_dir)
 
+    if not python_cmd.exists():
+        print(
+            "Virtualenv not found. Create it and install dependencies before running:\n"
+            "Windows: python -m venv .venv && .\\.venv\\Scripts\\activate && pip install -r auto-emailer-linkedin/requirements.txt\n"
+            "macOS/Linux: python3 -m venv .venv && source .venv/bin/activate && pip install -r auto-emailer-linkedin/requirements.txt"
+        )
+        sys.exit(1)
+
     print(f"Using interpreter: {python_cmd}")
     print(f"Starting web_app.py in {project_dir} ...")
 
