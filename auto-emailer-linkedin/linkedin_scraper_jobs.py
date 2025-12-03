@@ -53,11 +53,21 @@ EASY_APPLY_TEXT = "easy apply"
 # Experience Helpers
 # ---------------------------------------
 def extract_years(text: str):
+    # Standard "X years/yrs" patterns
     m = EXPERIENCE_RE.findall(text)
-    if not m:
-        return None
-    nums = [int(x) for x in m]
-    return max(nums) if nums else None
+    if m:
+        nums = [int(x) for x in m]
+        return max(nums) if nums else None
+
+    # "experience: 12+" patterns without the word years
+    m2 = re.search(r"experience[^0-9]{0,6}(\d{1,2})\s*\+?", text, re.I)
+    if m2:
+        try:
+            return int(m2.group(1))
+        except Exception:
+            return None
+
+    return None
 
 
 def is_experience_ok(text: str, max_years: int):

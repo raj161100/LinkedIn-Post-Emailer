@@ -68,6 +68,10 @@ DEFAULT_VISA_EXCLUDE = [
     "no cpt",
     "no opt",
     "no stem opt",
+    "usc & gc",
+    "usc gc",
+    "usc & gc only",
+    "usc gc only",
 ]
 
 DEFAULT_VISA_PREFER = [
@@ -105,11 +109,21 @@ NOT_HIRING_PHRASES = [
 # Experience helpers
 # ---------------------------
 def extract_years_of_experience(text: str):
+    # 1) Standard "X years/yrs" patterns
     matches = re.findall(r"(\d{1,2})\s*(?:\+?\s*)?(?:years?|yrs?)", text, re.I)
-    if not matches:
-        return None
-    nums = [int(x) for x in matches]
-    return max(nums) if nums else None
+    if matches:
+        nums = [int(x) for x in matches]
+        return max(nums) if nums else None
+
+    # 2) "experience: 12+" patterns without the word years
+    m = re.search(r"experience[^0-9]{0,6}(\d{1,2})\s*\+?", text, re.I)
+    if m:
+        try:
+            return int(m.group(1))
+        except Exception:
+            return None
+
+    return None
 
 
 def is_experience_allowed(
