@@ -20,6 +20,10 @@ Quick launcher
 - Run with Python: `python run_dashboard.py` from the repo root. It prefers `.venv/Scripts/python.exe` if present, otherwise uses system Python, starts `auto-emailer-linkedin/web_app.py`, and opens your browser to http://127.0.0.1:8000.
 - Build a Windows .exe (from the venv): `.\.venv\Scripts\pyinstaller --onefile --noconsole --name run-dashboard run_dashboard.py`. Double-click `dist/run-dashboard.exe` to start the app and open the browser. Rebuild after dependency changes.
 
+Build an .exe named LinkedInEmailer (from the venv)
+- Windows: `pyinstaller --onefile --noconsole --name LinkedInEmailer run_dashboard.py`
+- macOS: `pyinstaller --onefile --windowed --name LinkedInEmailer run_dashboard.py`
+
 Setup (Gmail + LinkedIn)
 - Create a `.env` in the repo root (or use the Account page to fill these later) with:
   - `LINKEDIN_EMAIL=your_linkedin_email`

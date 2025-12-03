@@ -1,6 +1,10 @@
 """
 Convenience launcher for the FastAPI dashboard.
 Double-click or run this file to start web_app.py using the local virtualenv.
+
+Build an exe (name: LinkedInEmailer) with PyInstaller:
+  Windows: pyinstaller --onefile --noconsole --name LinkedInEmailer run_dashboard.py
+  macOS:   pyinstaller --onefile --windowed --name LinkedInEmailer run_dashboard.py
 """
 
 import subprocess
