@@ -17,6 +17,7 @@ import threading
 import time
 from datetime import datetime, date
 from typing import List, Dict, Any
+import random
 
 from fastapi import FastAPI, Request, Form, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -520,6 +521,25 @@ async def health():
         "loop": RUN_LOOP,
         "last_run": LAST_RUN,
     }
+
+
+# ---------- SECRET / EASTER EGG ----------
+@app.get("/raj-secret", response_class=HTMLResponse)
+async def raj_secret(request: Request):
+    quotes = [
+        "Keep grinding. Today’s DM becomes tomorrow’s offer.",
+        "Ship fast, learn faster. One more email, one more win.",
+        "If it scares you, it’s probably worth doing.",
+        "Consistency beats intensity. Send one more outreach.",
+        "Nothing changes if nothing changes. Push the next build.",
+    ]
+    return templates.TemplateResponse(
+        "secret.html",
+        {
+            "request": request,
+            "quote": random.choice(quotes),
+        },
+    )
 
 
 if __name__ == "__main__":
