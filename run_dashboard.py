@@ -7,6 +7,7 @@ Build an exe (name: LinkedInEmailer) with PyInstaller:
   macOS:   pyinstaller --onefile --windowed --name LinkedInEmailer run_dashboard.py
 """
 
+import os
 import subprocess
 import sys
 import webbrowser
@@ -43,6 +44,42 @@ def find_python(project_dir: Path) -> Path:
         if cand.exists():
             return cand
     return Path(sys.executable)
+
+
+def build_exe_if_missing(base_dir: Path, python_cmd: Path):
+    """
+    If dist/LinkedInEmailer(.exe) is missing, attempt to build it with PyInstaller.
+    """
+    dist_dir = base_dir / "dist"
+    target = dist_dir / ("LinkedInEmailer.exe" if os.name == "nt" else "LinkedInEmailer")
+    if target.exists():
+        return
+
+    if getattr(sys, "frozen", False):
+        return  # already running as an exe; don't rebuild
+
+    try:
+        print("Building LinkedInEmailer executable with PyInstaller (this may take a minute)...")
+        subprocess.check_call(
+            [
+                str(python_cmd),
+                "-m",
+                "PyInstaller",
+                "--onefile",
+                "--noconsole" if os.name == "nt" else "--windowed",
+                "--name",
+                "LinkedInEmailer",
+                "run_dashboard.py",
+            ],
+            cwd=base_dir,
+        )
+        print(f"Built executable at: {target}")
+    except Exception as e:
+        print(
+            "PyInstaller build failed. Ensure pyinstaller is installed "
+            "(pip install pyinstaller) and retry. Error:",
+            e,
+        )
 
 
 def bootstrap_venv(project_dir: Path) -> Path:
@@ -82,6 +119,9 @@ def main():
 
     if not python_cmd.exists():
         python_cmd = bootstrap_venv(project_dir)
+
+    # Attempt to build the standalone exe if it's not present
+    build_exe_if_missing(base_dir, python_cmd)
 
     print(f"Using interpreter: {python_cmd}")
     print(f"Starting web_app.py in {project_dir} ...")
