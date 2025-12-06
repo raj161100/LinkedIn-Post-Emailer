@@ -15,6 +15,7 @@ import os
 import json
 import threading
 import time
+import asyncio
 from datetime import datetime, date
 from typing import List, Dict, Any
 import random
@@ -57,9 +58,11 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
+CREDENTIALS_PATH = os.path.join(BASE_DIR, "data", "credentials.json")
 
 os.makedirs(ASSETS_DIR, exist_ok=True)
 os.makedirs(LOGS_DIR, exist_ok=True)
+os.makedirs(os.path.dirname(CREDENTIALS_PATH), exist_ok=True)
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
@@ -71,6 +74,8 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 RUN_LOOP = False
 LOOP_THREAD = None
 LAST_RUN = None
+RUN_ONCE_ACTIVE = False
+LAST_RUN_ONCE_FINISHED = None
 
 def get_today_log_file():
     today = datetime.now().strftime("%Y-%m-%d")
@@ -104,6 +109,30 @@ def start_loop(interval: int):
 def stop_loop():
     global RUN_LOOP
     RUN_LOOP = False
+
+
+def load_credentials():
+    if not os.path.exists(CREDENTIALS_PATH):
+        return {}
+    try:
+        with open(CREDENTIALS_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def save_credentials(updates: Dict[str, Any]):
+    current = load_credentials()
+    changed = False
+    for k, v in updates.items():
+        if v is None or v == "":
+            continue
+        if current.get(k) != v:
+            current[k] = v
+            changed = True
+    if changed:
+        with open(CREDENTIALS_PATH, "w", encoding="utf-8") as f:
+            json.dump(current, f, indent=2)
 
 
 def update_env_file(path: str, updates: Dict[str, str]):
@@ -259,11 +288,29 @@ async def dashboard(request: Request):
 
 
 # ---------- RUN PIPELINE ----------
+
 @app.post("/run-once")
-async def run_once_route():
+async def run_once_route(request: Request):
+    try:
+        payload = await request.json()
+    except Exception:
+        payload = {}
+
+    print(f"[RunOnce] Triggered via UI with keys: {list(payload.keys())}")
+
     def worker():
-        import asyncio
-        asyncio.run(run_once_async())
+        global RUN_ONCE_ACTIVE, LAST_RUN_ONCE_FINISHED, LAST_RUN
+        RUN_ONCE_ACTIVE = True
+        try:
+            asyncio.run(run_once_async(payload))
+        except BaseException as exc:
+            import traceback
+            print("[RunOnce] ERROR:", exc)
+            traceback.print_exc()
+        finally:
+            RUN_ONCE_ACTIVE = False
+            LAST_RUN_ONCE_FINISHED = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            LAST_RUN = LAST_RUN_ONCE_FINISHED
 
     t = threading.Thread(target=worker, daemon=True)
     t.start()
@@ -273,6 +320,19 @@ async def run_once_route():
 
     return RedirectResponse("/dashboard", status_code=303)
 
+
+@app.post("/api/run", status_code=202)
+async def api_run(request: Request):
+    try:
+        payload = await request.json()
+    except Exception:
+        return {"status": "error", "detail": "Invalid JSON payload"}
+
+    asyncio.create_task(run_once_async(payload))
+
+    global LAST_RUN
+    LAST_RUN = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return {"status": "accepted", "received_keys": list(payload.keys())}
 
 
 @app.post("/loop/start")
@@ -293,9 +353,10 @@ async def stop_loop_route():
 @app.get("/settings", response_class=HTMLResponse)
 async def settings_page(request: Request):
     cfg = load_config()
+    creds = load_credentials()
     return templates.TemplateResponse(
         "settings.html",
-        {"request": request, "cfg": cfg},
+        {"request": request, "cfg": cfg, "creds": creds},
     )
 
 
@@ -312,6 +373,15 @@ async def update_settings(
     visa_prefer: str = Form(""),
     visa_exclude: str = Form(""),
     entry_terms: str = Form(""),
+    linkedin_email: str = Form(None),
+    linkedin_password: str = Form(None),
+    linkedin_cookie: str = Form(None),
+    gmail_sender: str = Form(None),
+    gmail_token: str = Form(None),
+    google_client_id: str = Form(None),
+    google_client_secret: str = Form(None),
+    google_project_id: str = Form(None),
+    google_secret_file: UploadFile = File(None),
 ):
     cfg = load_config()
 
@@ -356,6 +426,74 @@ async def update_settings(
     with open("config.json", "w", encoding="utf-8") as f:
         json.dump(cfg, f, indent=2)
 
+    cred_updates: Dict[str, Any] = {
+        "linkedin_email": linkedin_email,
+        "linkedin_password": linkedin_password,
+        "linkedin_cookie": linkedin_cookie,
+        "gmail_sender": gmail_sender,
+    }
+
+    if gmail_token:
+        try:
+            cred_updates["gmail_token"] = json.loads(gmail_token)
+        except Exception:
+            pass  # ignore invalid JSON to avoid breaking stored creds
+
+    # Handle Google client secret
+    client_secret_path = os.path.join(BASE_DIR, "google_client_secret.json")
+    existing_secret = {}
+    if os.path.exists(client_secret_path):
+        try:
+            with open(client_secret_path, "r", encoding="utf-8") as f:
+                existing_secret = json.load(f)
+        except Exception:
+            existing_secret = {}
+
+    # Option 1: uploaded JSON
+    if google_secret_file is not None:
+        content = await google_secret_file.read()
+        try:
+            parsed = json.loads(content.decode("utf-8"))
+            with open(client_secret_path, "w", encoding="utf-8") as f:
+                json.dump(parsed, f, indent=2)
+            cred_updates["google_client_id"] = parsed.get("installed", {}).get("client_id")
+            cred_updates["google_client_secret"] = parsed.get("installed", {}).get("client_secret")
+            cred_updates["google_project_id"] = parsed.get("installed", {}).get("project_id")
+        except Exception:
+            pass
+
+    # Option 2: typed values
+    elif google_client_id or google_client_secret or google_project_id:
+        base_installed = existing_secret.get("installed", {})
+        installed = {
+            "client_id": google_client_id or base_installed.get("client_id", ""),
+            "project_id": google_project_id or base_installed.get("project_id", "linkedin-auto-emailer"),
+            "auth_uri": base_installed.get("auth_uri", "https://accounts.google.com/o/oauth2/auth"),
+            "token_uri": base_installed.get("token_uri", "https://oauth2.googleapis.com/token"),
+            "auth_provider_x509_cert_url": base_installed.get(
+                "auth_provider_x509_cert_url", "https://www.googleapis.com/oauth2/v1/certs"
+            ),
+            "client_secret": google_client_secret or base_installed.get("client_secret", ""),
+            "redirect_uris": base_installed.get("redirect_uris", ["http://localhost"]),
+        }
+        with open(client_secret_path, "w", encoding="utf-8") as f:
+            json.dump({"installed": installed}, f, indent=2)
+        cred_updates["google_client_id"] = installed["client_id"]
+        cred_updates["google_client_secret"] = installed["client_secret"]
+        cred_updates["google_project_id"] = installed["project_id"]
+
+    save_credentials(cred_updates)
+
+    return RedirectResponse("/settings", status_code=303)
+
+@app.post("/delete-token")
+async def delete_token():
+    token_path = os.path.join(BASE_DIR, "token.json")
+    if os.path.exists(token_path):
+        try:
+            os.remove(token_path)
+        except Exception:
+            pass
     return RedirectResponse("/settings", status_code=303)
 
 # ---------- LOGS ----------
@@ -519,6 +657,15 @@ async def health():
     return {
         "status": "ok",
         "loop": RUN_LOOP,
+        "last_run": LAST_RUN,
+    }
+
+
+@app.get("/run-status")
+async def run_status():
+    return {
+        "running": RUN_ONCE_ACTIVE,
+        "last_finished": LAST_RUN_ONCE_FINISHED,
         "last_run": LAST_RUN,
     }
 

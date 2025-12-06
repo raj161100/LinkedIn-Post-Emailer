@@ -3,7 +3,81 @@
 
 <h1 class="text-4xl font-bold mb-6">Settings</h1>
 
-<form method="post" action="/update-settings" class="space-y-8">
+<form method="post" action="/update-settings" class="space-y-8" enctype="multipart/form-data">
+
+    <!-- GOOGLE CLIENT SECRET -->
+    <div class="card bg-neutral shadow-xl p-6">
+        <h2 class="text-xl font-semibold mb-3">Google OAuth Client</h2>
+        <p class="text-sm text-gray-300 mb-3">Upload a client secret JSON or paste Client ID/Secret.</p>
+
+        <label class="block">
+            <span class="text-gray-300">Upload google_client_secret.json</span>
+            <input type="file" name="google_secret_file" accept=".json" class="file-input file-input-bordered w-full bg-[#1a2130]">
+        </label>
+
+        <div class="grid md:grid-cols-2 gap-4 mt-4">
+            <label class="block">
+                <span class="text-gray-300">Client ID</span>
+                <input type="text" name="google_client_id" value="{{ creds.google_client_id or '' }}"
+                       class="input input-bordered w-full bg-[#1a2130]">
+            </label>
+            <label class="block">
+                <span class="text-gray-300">Client Secret</span>
+                <input type="text" name="google_client_secret" value="{{ creds.google_client_secret or '' }}"
+                       class="input input-bordered w-full bg-[#1a2130]">
+            </label>
+        </div>
+
+        <label class="block mt-4">
+            <span class="text-gray-300">Project ID</span>
+            <input type="text" name="google_project_id" value="{{ creds.google_project_id or 'linkedin-auto-emailer' }}"
+                   class="input input-bordered w-full bg-[#1a2130]">
+        </label>
+
+        <p class="text-xs text-gray-400 mt-2">Saving writes google_client_secret.json and stores the IDs locally.</p>
+    </div>
+
+    <!-- CREDENTIALS -->
+    <div class="card bg-neutral shadow-xl p-6">
+        <h2 class="text-xl font-semibold mb-3">Credentials (stored locally)</h2>
+
+        <label class="block">
+            <span class="text-gray-300">LinkedIn Email</span>
+            <input type="email" name="linkedin_email" value="{{ creds.linkedin_email or '' }}"
+                class="input input-bordered w-full bg-[#1a2130]">
+        </label>
+
+        <label class="block mt-4">
+            <span class="text-gray-300">LinkedIn Password (optional if using cookie)</span>
+            <input type="password" name="linkedin_password" value="{{ creds.linkedin_password or '' }}"
+                class="input input-bordered w-full bg-[#1a2130]">
+        </label>
+
+        <label class="block mt-4">
+            <span class="text-gray-300">LinkedIn li_at Cookie (preferred)</span>
+            <input type="text" name="linkedin_cookie" value="{{ creds.linkedin_cookie or '' }}"
+                class="input input-bordered w-full bg-[#1a2130]">
+        </label>
+
+        <label class="block mt-4">
+            <span class="text-gray-300">Gmail Sender</span>
+            <input type="email" name="gmail_sender" value="{{ creds.gmail_sender or '' }}"
+                class="input input-bordered w-full bg-[#1a2130]">
+        </label>
+
+        <label class="block mt-4">
+            <span class="text-gray-300">Gmail OAuth Token (JSON)</span>
+            <textarea name="gmail_token" class="textarea textarea-bordered w-full bg-[#1a2130]" rows="4">{{ creds.gmail_token | tojson if creds.gmail_token else '' }}</textarea>
+        </label>
+
+        <p class="text-sm text-gray-400 mt-2">Saved to data/credentials.json and reused automatically by the engine.</p>
+
+        <div class="flex justify-end mt-4">
+            <form method="post" action="/delete-token" onsubmit="return confirm('Delete existing Gmail token.json?');">
+                <button class="btn btn-outline btn-error btn-sm" type="submit">Delete token.json</button>
+            </form>
+        </div>
+    </div>
 
     <!-- AUTO APPLY -->
     <div class="card bg-neutral shadow-xl p-6">

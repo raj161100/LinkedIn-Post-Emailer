@@ -354,6 +354,7 @@ async def search_posts_with_emails(
     keywords: List[str],
     pages: int,
     max_years: int,
+    ln_cookie: str = "",
 ) -> List[Dict[str, Any]]:
     # filters from config.json (optional)
     include_locs: List[str] = []
@@ -390,7 +391,27 @@ async def search_posts_with_emails(
         browser = await p.chromium.launch(headless=False, slow_mo=700)
 
         state_path = "linkedin_state.json"
-        if os.path.exists(state_path):
+        context = None
+        used_cookie = False
+
+        if ln_cookie:
+            print("[cyan]Using provided LinkedIn cookie[/cyan]")
+            cookie_state = {
+                "cookies": [
+                    {
+                        "name": "li_at",
+                        "value": ln_cookie,
+                        "domain": ".linkedin.com",
+                        "path": "/",
+                        "httpOnly": True,
+                        "secure": True,
+                        "sameSite": "None",
+                    }
+                ]
+            }
+            context = await browser.new_context(storage_state=cookie_state)
+            used_cookie = True
+        elif os.path.exists(state_path):
             print("[cyan]Reusing saved LinkedIn session...[/cyan]")
             context = await browser.new_context(storage_state=state_path)
         else:
@@ -398,13 +419,16 @@ async def search_posts_with_emails(
             context = await browser.new_context()
 
         page = await context.new_page()
-        await _ensure_logged_in(page, ln_email, ln_password)
 
-        # Save session if we just logged in
-        try:
-            await context.storage_state(path=state_path)
-        except Exception:
-            pass
+        if used_cookie:
+            # Best-effort check to ensure the cookie is valid
+            await page.goto("https://www.linkedin.com/feed/", wait_until="domcontentloaded")
+        else:
+            await _ensure_logged_in(page, ln_email, ln_password)
+            try:
+                await context.storage_state(path=state_path)
+            except Exception:
+                pass
 
         all_posts: List[Dict[str, Any]] = []
         for kw in keywords:
@@ -439,13 +463,14 @@ async def login_and_collect_emails(
     keywords: List[str],
     pages: int,
     max_years: int = 5,
+    ln_cookie: str = "",
 ) -> Dict[str, List[str]]:
     """
     Returns { keyword: [emails...] } for posts passing filters,
     with preferred posts' emails first.
     """
     posts = await search_posts_with_emails(
-        ln_email, ln_password, keywords, pages, max_years
+        ln_email, ln_password, keywords, pages, max_years, ln_cookie
     )
 
     grouped: Dict[str, Dict[str, List[str]]] = {}

@@ -3,7 +3,7 @@ import json
 import os
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Dict, List
+from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
 from rich import print
@@ -19,14 +19,10 @@ from cache import SeenCache
 # -----------------------------
 # ENV + constants
 # -----------------------------
-load_dotenv()  # <--- IMPORTANT: load .env once at import time
+load_dotenv()  # Keep legacy support, but prefer runtime payloads now
 
 COOLDOWN_DAYS = int(os.getenv("JOB_COOLDOWN_DAYS", "10"))
-
 # Send summary here; if REPORT_RECEIVER is not set, fall back to sender
-REPORT_RECEIVER = os.getenv("REPORT_RECEIVER", "").strip()
-
-COOLDOWN_DAYS = 10
 REPORT_RECEIVER = os.getenv("REPORT_RECEIVER", "").strip()
 
 
@@ -35,22 +31,89 @@ def load_config():
         return json.load(f)
 
 
-def get_env():
-    load_dotenv()
-    ln_email = os.getenv("LINKEDIN_EMAIL")
-    ln_password = os.getenv("LINKEDIN_PASSWORD")
-    sender = os.getenv("GMAIL_SENDER", "").strip()
+def load_saved_credentials():
+    """
+    Optional local fallback for credentials stored by the dashboard.
+    """
+    path = os.path.join("data", "credentials.json")
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
 
-    if not ln_email or not ln_password:
-        raise SystemExit("❌ Missing LinkedIn credentials in .env")
+
+def build_run_context(run_data: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Resolve credentials + runtime overrides.
+
+    Priority order:
+      1) Values supplied via `run_data`
+      2) Saved credentials file (set via dashboard settings)
+      3) Legacy fallback to environment variables (for local runs)
+    """
+    load_dotenv()
+    saved = load_saved_credentials()
+    data = run_data or {}
+
+    ln_email = (
+        data.get("linkedin_email")
+        or saved.get("linkedin_email")
+        or os.getenv("LINKEDIN_EMAIL")
+    )
+    ln_password = (
+        data.get("linkedin_password")
+        or saved.get("linkedin_password")
+        or os.getenv("LINKEDIN_PASSWORD")
+    )
+    ln_cookie = data.get("linkedin_cookie") or saved.get("linkedin_cookie")
+    sender = (
+        data.get("gmail_sender")
+        or saved.get("gmail_sender")
+        or os.getenv("GMAIL_SENDER", "")
+    ).strip()
+    gmail_token = data.get("gmail_token") or saved.get("gmail_token")
+
+    resume_override = (
+        data.get("resume_path")
+        or data.get("resume_file")
+        or data.get("resume")
+    )
+    user_payload = data.get("user_payload") or data.get("payload") or {}
+
+    if not ln_cookie and (not ln_email or not ln_password):
+        msg = "❌ Missing LinkedIn credentials: provide linkedin_cookie or linkedin_email/linkedin_password"
+        print(msg)
+        raise SystemExit(msg)
 
     if not sender:
-        raise SystemExit("❌ Missing GMAIL_SENDER in .env")
+        msg = "❌ Missing Gmail sender: provide gmail_sender"
+        print(msg)
+        raise SystemExit(msg)
 
-    return ln_email, ln_password, sender
+    return {
+        "linkedin_email": ln_email,
+        "linkedin_password": ln_password,
+        "linkedin_cookie": ln_cookie,
+        "gmail_sender": sender,
+        "gmail_token": gmail_token,
+        "resume_override": resume_override,
+        "user_payload": user_payload,
+    }
 
 
-def send_to_all(emails: List[str], sender: str, subject: str, body: str, attachment_path: str):
+
+
+def send_to_all(
+    emails: List[str],
+    sender: str,
+    subject: str,
+    body: str,
+    attachment_path: str,
+    gmail_token,
+):
     sent = []
     for e in emails:
         try:
@@ -60,11 +123,12 @@ def send_to_all(emails: List[str], sender: str, subject: str, body: str, attachm
                 subject=subject,
                 body_text=body,
                 attachment_path=attachment_path,
+                token_data=gmail_token,
             )
-            print(f"[green]✅ Sent to {e}[/green]")
+            print(f"[green]Sent to {e}[/green]")
             sent.append(e)
         except Exception as ex:
-            print(f"[red]❌ Failed to send {e}: {ex}[/red]")
+            print(f"[red]Failed to send {e}: {ex}[/red]")
     return sent
 
 
@@ -204,7 +268,7 @@ def generate_report_body():
     return "\n".join(lines)
 
 
-def send_summary(sender: str) -> None:
+def send_summary(sender: str, gmail_token=None) -> None:
     """
     Email yourself a grouped summary for today's run.
 
@@ -238,6 +302,7 @@ def send_summary(sender: str) -> None:
             to_addrs=[recipient],
             subject=subject,
             body_text=body,
+            token_data=gmail_token,
         )
         print(f"[green]📧 Summary Email Sent to {recipient}[/green]")
 
@@ -248,9 +313,19 @@ def send_summary(sender: str) -> None:
 # -----------------------------
 # ASYNC CORE EXECUTION (used by dashboard)
 # -----------------------------
-async def run_once_async():
+
+
+async def run_once_async(run_data: Optional[Dict[str, Any]] = None):
+    print("[RunOnce] Starting engine run...")
     cfg = load_config()
-    ln_email, ln_password, sender = get_env()
+    ctx = build_run_context(run_data)
+
+    ln_email = ctx["linkedin_email"]
+    ln_password = ctx["linkedin_password"]
+    ln_cookie = ctx["linkedin_cookie"]
+    sender = ctx["gmail_sender"]
+    gmail_token = ctx["gmail_token"]
+    resume_override = ctx["resume_override"]
 
     cache_file = cfg.get("cache_file", "data/seen.jsonl")
     cache = SeenCache(cache_file)
@@ -273,9 +348,9 @@ async def run_once_async():
 
         print(f"\n[bold yellow]=== Processing Role: {role_name} ===[/bold yellow]")
 
-        static_resume = role["resume_path"]
+        static_resume = resume_override or role["resume_path"]
         customize_enabled = role["customize"]["enabled"]
-        base_resume = role["customize"]["base_resume"]
+        base_resume = resume_override or role["customize"]["base_resume"]
         required_skills = [s.lower() for s in role.get("required_skills", [])]
 
         subject = role["message_subject"]
@@ -283,10 +358,10 @@ async def run_once_async():
 
         # 1) SCRAPE POSTS + EMAIL GROUPS
         posts = await search_posts_with_emails(
-            ln_email, ln_password, keywords, pages, max_years
+            ln_email, ln_password, keywords, pages, max_years, ln_cookie
         )
         email_groups = await login_and_collect_emails(
-            ln_email, ln_password, keywords, pages, max_years
+            ln_email, ln_password, keywords, pages, max_years, ln_cookie
         )
 
         # role-level de-dup
@@ -324,9 +399,9 @@ async def run_once_async():
                     output_dir="assets/generated_resumes",
                     company_hint=company_hint,
                 )
-                print(f"[cyan]📝 Tailored resume generated: {tailored_resume}[/cyan]")
+                print(f"[cyan]Tailored resume generated: {tailored_resume}[/cyan]")
             except Exception as e:
-                print(f"[yellow]⚠ Resume customization failed: {e}[/yellow]")
+                print(f"[yellow]Resume customization failed: {e}[/yellow]")
 
         resume_path = tailored_resume or static_resume
 
@@ -334,7 +409,14 @@ async def run_once_async():
         if not unique_new_emails:
             print("[dim]No new unique emails for this role.[/dim]")
         else:
-            sent = send_to_all(unique_new_emails, sender, subject, body, resume_path)
+            sent = send_to_all(
+                unique_new_emails,
+                sender,
+                subject,
+                body,
+                resume_path,
+                gmail_token=gmail_token,
+            )
 
             cache.add_all(
                 [f"{role_name}|{e}|{datetime.now().strftime('%Y-%m-%d')}" for e in sent]
@@ -374,14 +456,15 @@ async def run_once_async():
     job_cache.close()
 
     # send daily summary
-    send_summary(sender)
+    send_summary(sender, gmail_token=gmail_token)
+    print("[RunOnce] Finished engine run.")
 
 
 # -----------------------------
 # CLI helper for manual runs
 # -----------------------------
-def run_once():
-    asyncio.run(run_once_async())
+def run_once(run_data: Optional[Dict[str, Any]] = None):
+    asyncio.run(run_once_async(run_data))
 
 
 if __name__ == "__main__":
